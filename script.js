@@ -43,7 +43,7 @@ document.querySelectorAll('section, .project-card, .blog-card, .video-card').for
     observer.observe(element);
 });
 
-// Mobile menu toggle (if needed)
+// Mobile menu toggle
 const createMobileMenu = () => {
     const navbar = document.querySelector('.navbar');
     const navLinks = document.querySelector('.nav-links');
@@ -54,9 +54,22 @@ const createMobileMenu = () => {
             const mobileMenuBtn = document.createElement('button');
             mobileMenuBtn.className = 'mobile-menu-btn';
             mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            mobileMenuBtn.setAttribute('aria-label', 'Toggle menu');
             
             mobileMenuBtn.addEventListener('click', () => {
                 navLinks.classList.toggle('active');
+                // Change icon based on menu state
+                mobileMenuBtn.innerHTML = navLinks.classList.contains('active') 
+                    ? '<i class="fas fa-times"></i>' 
+                    : '<i class="fas fa-bars"></i>';
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!navLinks.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                    navLinks.classList.remove('active');
+                    mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                }
             });
             
             container.appendChild(mobileMenuBtn);

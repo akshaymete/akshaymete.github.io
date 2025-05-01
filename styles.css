@@ -595,12 +595,39 @@ footer {
 
 @media (max-width: 768px) {
     .container {
-        max-width: 100%;
         padding: 0 1rem;
     }
     
     .nav-links {
         display: none;
+        position: fixed;
+        top: 60px;
+        left: 0;
+        width: 100%;
+        background: var(--section-bg);
+        flex-direction: column;
+        padding: 1rem;
+        gap: 1rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+    }
+    
+    .nav-links.active {
+        display: flex;
+    }
+    
+    .mobile-menu-btn {
+        display: block;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: var(--text-color);
+        cursor: pointer;
+        padding: 0.5rem;
+    }
+    
+    .mobile-menu-btn:hover {
+        color: var(--accent-color);
     }
     
     .hero {

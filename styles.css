@@ -73,18 +73,10 @@ body {
 .nav-left {
     display: flex;
     align-items: center;
-    gap: 1rem;
-}
-
-.logo {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--accent-color);
-    text-decoration: none;
 }
 
 .site-title {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: 600;
     color: var(--primary-color);
     text-decoration: none;
@@ -244,6 +236,7 @@ body {
 /* Sections */
 section {
     padding: 2.5rem 0;
+    scroll-margin-top: 80px;
 }
 
 section:nth-child(even) {
@@ -257,6 +250,7 @@ h2 {
     font-weight: 600;
     letter-spacing: -0.5px;
     color: var(--primary-color);
+    padding-top: 1rem;
 }
 
 /* About Section */

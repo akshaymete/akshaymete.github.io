@@ -1,0 +1,22 @@
+# System files
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build files
+node_modules/
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+
+# CV files
+cv.tex
+cv.pdf 

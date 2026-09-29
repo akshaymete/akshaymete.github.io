@@ -2,383 +2,292 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Akshay Mete - PhD Student in Reinforcement Learning</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Akshay Mete</title>
+    <meta name="description" content="Akshay Mete, postdoctoral researcher at Texas A&amp;M University working on world models, connecting deep model-based reinforcement learning with adaptive control.">
+    <link rel="canonical" href="https://akshaymete.com/">
+    <meta property="og:type" content="profile">
+    <meta property="og:title" content="Akshay Mete">
+    <meta property="og:description" content="Postdoctoral researcher at Texas A&amp;M University working on world models, connecting deep model-based reinforcement learning with adaptive control.">
+    <meta property="og:url" content="https://akshaymete.com/">
+    <meta property="og:image" content="https://akshaymete.com/images/portrait.jpg">
+    <meta name="twitter:card" content="summary">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap">
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- MathJax -->
     <script>
-        window.MathJax = {
-            tex: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']],
-                displayMath: [['$$', '$$'], ['\\[', '\\]']],
-                processEscapes: true
-            },
-            svg: {
-                fontCache: 'global'
-            }
-        };
+        try {
+            var saved = localStorage.getItem('theme');
+            if (saved) document.documentElement.setAttribute('data-theme', saved);
+        } catch (e) {}
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="container">
-            <div class="nav-left">
-                <a href="#" class="site-title">Akshay Mete</a>
-            </div>
-            <div class="nav-right">
-                <ul class="nav-links">
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#research">Research</a></li>
-                    <li><a href="#publications">Publications</a></li>
-                    <li><a href="#experience">Experience</a></li>
-                    <li><a href="#education">Education</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                    <li>
-                        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
-                            <span class="theme-icon">🌙</span>
-                        </button>
-                    </li>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-nav">
+        <div class="wrap nav-inner">
+            <a class="brand" href="#top">Akshay Mete</a>
+            <nav class="nav-links" aria-label="Sections">
+                <a href="#research">Research</a>
+                <a href="#publications">Publications</a>
+                <a href="#teaching">Teaching</a>
+                <a href="#talks">Talks &amp; Service</a>
+                <a href="#background">Background</a>
+            </nav>
+            <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle dark mode">
+                <svg class="icon-moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+                <svg class="icon-sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <main id="main" class="wrap">
+
+        <section class="intro" id="top">
+            <img class="portrait" src="images/portrait.jpg" alt="Portrait of Akshay Mete" width="200" height="250">
+            <div class="intro-text">
+                <h1>Akshay Mete</h1>                <p class="role">Postdoctoral Researcher, Electrical and Computer Engineering<br>Texas A&amp;M University</p>
+                <p class="lede">I work on building AI agents that understand and act reliably in the physical world. Drawing on the long-standing theory of adaptive control, I address fundamental questions in world models, such as exploration and adaptation.</p>
+                <p>I am a postdoctoral researcher at Texas A&amp;M University, working with <a href="https://engineering.tamu.edu/electrical/profiles/pkumar.html">Prof. P. R. Kumar</a>, with whom I also completed my PhD in 2026. Before that, I completed a dual degree (B.Tech.&nbsp;+ M.Tech.) in Electrical Engineering at IIT Bombay.</p>
+                <p class="market">I am on the academic job market for 2026&ndash;27.</p>
+                <ul class="links">
+                    <li><a href="https://scholar.google.com/citations?user=evLF1akAAAAJ&amp;hl">Google Scholar</a></li>
+                    <li><a href="https://github.com/akshaymete">GitHub</a></li>
+                    <li><a href="https://linkedin.com/in/akshaymete">LinkedIn</a></li>
+                    <li class="email">lastnamefirstname@gmail.com</li>
                 </ul>
             </div>
-        </div>
-    </nav>
+        </section>
 
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <div class="profile-image">
-                    <img src="images/profile.jpg" alt="Akshay Mete" class="profile-img">
+        <section class="section" id="research">
+            <h2>Research</h2>
+            <div class="section-body">
+                <div class="topic">
+                    <h3>Training objectives for deep world models</h3>
+                    <p>Optimistic World Models change how a world model is trained: an optimistic dynamics loss, derived from reward-biased maximum likelihood estimation in adaptive control, biases imagined transitions toward higher-reward outcomes. The loss is fully gradient-based, needs no uncertainty estimates, and plugs into existing world-model architectures; we instantiate it in DreamerV3 and STORM.</p>
+                    <p class="papers">Key paper: <a href="#p-owm">arXiv 2026</a></p>
                 </div>
-                <h1>Akshay Mete</h1>
-                <p class="hero-subtitle">PhD Student in Reinforcement Learning at Texas A&M University, College Station, TX, USA</p>
-                <div class="cta-buttons">
-                    <a href="#research" class="btn primary">View Research</a>
-                    <a href="#contact" class="btn secondary">Get in Touch</a>
+                <div class="topic">
+                    <h3>Reward-biased model learning</h3>
+                    <p>Reward-Biased Maximum Likelihood Estimation (RBMLE) fits a model of the environment by maximum likelihood, biased toward models that promise higher reward, so that the model the agent learns is shaped by what it needs to control. I have developed RBMLE for Markov decision processes and linear systems, with applications to safe, multi-objective, and RLHF settings.</p>
+                    <p class="papers">Key papers: <a href="#p-l4dc21">L4DC 2021</a> &middot; <a href="#p-allerton23">Allerton 2023</a></p>
+                </div>
+                <div class="topic">
+                    <h3>Learning models in closed loop, with guarantees</h3>
+                    <p>For linear systems, I study how well an agent can learn its model while controlling with it, measured by regret. PIECE is a self-tuning regulator for auto-regressive systems with the first <i>O</i>(log&nbsp;<i>T</i>) regret bound for self-tuning regulation, and augmented RBMLE-UCB brings reward-biased model learning to adaptive linear&ndash;quadratic control.</p>
+                    <p class="papers">Key papers: <a href="#p-icml24">ICML 2024</a> &middot; <a href="#p-neurips22">NeurIPS 2022</a></p>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section id="about" class="about">
-        <div class="container">
-            <h2>About Me</h2>
-            <div class="about-content">
-                <p>I am a PhD student at Texas A&M University, specializing in reinforcement learning, adaptive control, and applied machine learning.</p>
-                <div class="social-buttons">
-                    <a href="https://scholar.google.com/citations?user=evLF1akAAAAJ&hl" class="btn scholar" target="_blank">
-                        <i class="fas fa-graduation-cap"></i> Google Scholar
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="research" class="research">
-        <div class="container">
-            <h2>Research Projects</h2>
-            <div class="projects-grid">
-                <div class="project-card">
-                    <h3>The Exploration-Exploitation Trade-Off in Reinforcement Learning</h3>
-                    <p>Reward Biased Maximum Likelihood Estimation (RBMLE) algorithm, an online model-based RL algorithm</p>
-                    <ul>
-                        <li>Addresses excessive exploration in UCB algorithms</li>
-                        <li>Incorporates controlled exploration without explicit confidence intervals</li>
-                        <li>Demonstrates promising performance in MDPs, linear time series, safe RL, multi-objective RL, and RLHF for Language Models</li>
-                    </ul>
-                </div>
-                <div class="project-card">
-                    <h3>Reinforcement Learning for Auto-Regressive Time Series</h3>
-                    <p>PIECE, a self-tuning regulator for linear time series with \( \mathcal{O}(\log T) \) regret</p>
-                    <ul>
-                        <li>First \( \mathcal{O}(\log T) \) regret bound for self-tuning regulation</li>
-                        <li>Outperforms traditional control algorithms</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="publications" class="publications">
-        <div class="container">
+        <section class="section" id="publications">
             <h2>Publications</h2>
-            
-            <div class="research-area">
-                <h3>Reinforcement Learning</h3>
-                <div class="timeline">
-                    <div class="timeline-item">
-                        <div class="timeline-item-content">
-                            <h4>Augmented RBMLE-UCB Approach for Adaptive Control of Linear Quadratic Systems</h4>
-                            <p class="company">Advances in Neural Information Processing Systems (NeurIPS) 2022</p>
-                            <p class="date">A. Mete, R. Singh, and P. R. Kumar</p>
-                        </div>
-                        <a href="https://proceedings.neurips.cc/paper_files/paper/2022/file/3c601cd5866099648c6dc783e7f39858-Paper-Conference.pdf" class="btn secondary paper" target="_blank">Paper</a>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-item-content">
-                            <h4>Reward Biased Maximum Likelihood Estimation for Reinforcement Learning</h4>
-                            <p class="company">Learning for Dynamics and Control (L4DC) 2021</p>
-                            <p class="date">A. Mete, R. Singh, Xi Liu, and P. R. Kumar</p>
-                        </div>
-                        <a href="https://proceedings.mlr.press/v144/mete21a/mete21a.pdf" class="btn secondary paper" target="_blank">Paper</a>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-item-content">
-                            <h4>Finite Time Regret Bounds for Self-Tuning Regulation</h4>
-                            <p class="company">International Conference on Machine Learning (ICML) 2024</p>
-                            <p class="date">R. Singh, A. Mete, A. Kar, and P. R. Kumar</p>
-                        </div>
-                        <a href="https://raw.githubusercontent.com/mlresearch/v235/main/assets/singh24b/singh24b.pdf" class="btn secondary paper" target="_blank">Paper</a>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-item-content">
-                            <h4>The Reward Biased Method: An Optimism based Approach for Reinforcement Learning</h4>
-                            <p class="company">Allerton Conference on Communication, Control, and Computing 2023 (Invited Paper)</p>
-                            <p class="date">A. Mete, R. Singh, and P. R. Kumar</p>
-                        </div>
-                        <a href="https://par.nsf.gov/servlets/purl/10482159" class="btn secondary paper" target="_blank">Paper</a>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-item-content">
-                            <h4>The RBMLE Method for Reinforcement Learning</h4>
-                            <p class="company">Conference on Information Sciences and Systems (CISS) 2022 (Invited Paper)</p>
-                            <p class="date">A. Mete, R. Singh, and P. R. Kumar</p>
-                        </div>
-                        <a href="https://par.nsf.gov/servlets/purl/10482165" class="btn secondary paper" target="_blank">Paper</a>
-                    </div>
-                </div>
-            </div>
+            <div class="section-body">
 
-            <div class="research-area">
-                <h3>Game Theory for Networks</h3>
-                <div class="timeline">
-                    <div class="timeline-item">
-                        <div class="timeline-item-content">
-                            <h4>Partial Server Pooling in Redundancy Systems</h4>
-                            <p class="company">International Teletraffic Congress (ITC 31) 2019</p>
-                            <p class="date">A. Mete, D. Manjunath, J. Nair, and B. Prabhu</p>
-                        </div>
-                        <a href="https://ieeexplore.ieee.org/abstract/document/8879441" class="btn secondary paper" target="_blank">Paper</a>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-item-content">
-                            <h4>Partial Server Pooling in Delay Systems</h4>
-                            <p class="company">ACM Transactions on Modeling and Performance Evaluation of Computing Systems 2024</p>
-                            <p class="date">V. Rohit, A. Mete, D. Manjunath, J. Nair, and B. Prabhu</p>
-                        </div>
-                        <a href="https://hal.science/hal-04443590v1/file/submission.pdf" class="btn secondary paper" target="_blank">Paper</a>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-item-content">
-                            <h4>Caching Policies for D2D-assisted Content Delivery Systems</h4>
-                            <p class="company">Technologies for the Wireless Edge Workshop, MobiCom 2018</p>
-                            <p class="date">A. Mete and S. Moharir</p>
-                        </div>
-                        <a href="https://dl.acm.org/doi/abs/10.1145/3266276.3266278" class="btn secondary paper" target="_blank">Paper</a>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-item-content">
-                            <h4>Low Latency Scheduling for D2D Communication</h4>
-                            <p class="company">International Conference on Communication Systems & Networks (COMSNETS) 2019</p>
-                            <p class="date">A. Mete</p>
-                        </div>
-                        <a href="https://ieeexplore.ieee.org/abstract/document/8711322" class="btn secondary paper" target="_blank">Paper</a>
-                    </div>
-                </div>
-            </div>
+                <h3 class="group">World Models, Reinforcement Learning, and Control</h3>
 
-            <div class="research-area">
-                <h3>CyberSecurity</h3>
-                <div class="timeline">
-                    <div class="timeline-item">
-                        <div class="timeline-item-content">
-                            <h4>Cyber-Secure and Safe Operation of Solar Photovoltaic Power Distribution Systems</h4>
-                            <p class="company">IEEE Applied Power Electronics Conference and Exposition (APEC) 2024</p>
-                            <p class="date">J. Kim, H. Ibrahim, S. Wang, A. Mete, L. Xie, P. Enjeti, and P.R. Kumar</p>
-                        </div>
-                        <a href="https://ieeexplore.ieee.org/abstract/document/10509340" class="btn secondary paper" target="_blank">Paper</a>
+                <article class="pub" id="p-owm">
+                    <div class="venue"><span class="tag pre">arXiv</span><span class="year">2026</span></div>
+                    <div>
+                        <h4 class="pub-title"><a href="https://arxiv.org/abs/2602.10044">Optimistic World Models: Efficient Exploration in Model-Based Deep Reinforcement Learning</a></h4>
+                        <p class="authors"><b>A. Mete</b>, S. A. Sheikh, T.-H. Lin, D. Kalathil, P. R. Kumar</p>
+                        <p class="cite">Preprint <a class="pdf" href="https://arxiv.org/abs/2602.10044">arXiv</a></p>
+                    </div>
+                </article>
+
+                <article class="pub" id="p-icml24">
+                    <div class="venue"><span class="tag">ICML</span><span class="year">2024</span></div>
+                    <div>
+                        <h4 class="pub-title"><a href="https://raw.githubusercontent.com/mlresearch/v235/main/assets/singh24b/singh24b.pdf">Finite Time Regret Bounds for Self-Tuning Regulation</a></h4>
+                        <p class="authors">R. Singh, <b>A. Mete</b>, A. Kar, P. R. Kumar</p>
+                        <p class="cite">International Conference on Machine Learning <a class="pdf" href="https://raw.githubusercontent.com/mlresearch/v235/main/assets/singh24b/singh24b.pdf">PDF</a></p>
+                    </div>
+                </article>
+
+                <article class="pub" id="p-allerton23">
+                    <div class="venue"><span class="tag">Allerton</span><span class="year">2023</span></div>
+                    <div>
+                        <h4 class="pub-title"><a href="https://par.nsf.gov/servlets/purl/10482159">The Reward Biased Method: An Optimism Based Approach for Reinforcement Learning</a></h4>
+                        <p class="authors"><b>A. Mete</b>, R. Singh, P. R. Kumar</p>
+                        <p class="cite">Allerton Conference on Communication, Control, and Computing <span class="note">Invited</span> <a class="pdf" href="https://par.nsf.gov/servlets/purl/10482159">PDF</a></p>
+                    </div>
+                </article>
+
+                <article class="pub" id="p-vbmle">
+                    <div class="venue"><span class="tag pre">arXiv</span><span class="year">2023</span></div>
+                    <div>
+                        <h4 class="pub-title"><a href="https://arxiv.org/abs/2310.11515">Value-Biased Maximum Likelihood Estimation for Model-based Reinforcement Learning in Discounted Linear MDPs</a></h4>
+                        <p class="authors">Y.-H. Hung, P.-C. Hsieh, <b>A. Mete</b>, P. R. Kumar</p>
+                        <p class="cite">Preprint <a class="pdf" href="https://arxiv.org/abs/2310.11515">arXiv</a></p>                    </div>
+                </article>
+
+                <article class="pub" id="p-neurips22">
+                    <div class="venue"><span class="tag">NeurIPS</span><span class="year">2022</span></div>
+                    <div>
+                        <h4 class="pub-title"><a href="https://proceedings.neurips.cc/paper_files/paper/2022/file/3c601cd5866099648c6dc783e7f39858-Paper-Conference.pdf">Augmented RBMLE-UCB Approach for Adaptive Control of Linear Quadratic Systems</a></h4>
+                        <p class="authors"><b>A. Mete</b>, R. Singh, P. R. Kumar</p>
+                        <p class="cite">Advances in Neural Information Processing Systems <a class="pdf" href="https://proceedings.neurips.cc/paper_files/paper/2022/file/3c601cd5866099648c6dc783e7f39858-Paper-Conference.pdf">PDF</a> <a class="pdf" href="https://arxiv.org/abs/2201.10542">arXiv</a></p>
+                    </div>
+                </article>
+
+                <article class="pub">
+                    <div class="venue"><span class="tag">CISS</span><span class="year">2022</span></div>
+                    <div>
+                        <h4 class="pub-title"><a href="https://par.nsf.gov/servlets/purl/10482165">The RBMLE Method for Reinforcement Learning</a></h4>
+                        <p class="authors"><b>A. Mete</b>, R. Singh, P. R. Kumar</p>
+                        <p class="cite">Conference on Information Sciences and Systems <span class="note">Invited</span> <a class="pdf" href="https://par.nsf.gov/servlets/purl/10482165">PDF</a></p>
+                    </div>
+                </article>
+
+                <article class="pub" id="p-l4dc21">
+                    <div class="venue"><span class="tag">L4DC</span><span class="year">2021</span></div>
+                    <div>
+                        <h4 class="pub-title"><a href="https://proceedings.mlr.press/v144/mete21a/mete21a.pdf">Reward Biased Maximum Likelihood Estimation for Reinforcement Learning</a></h4>
+                        <p class="authors"><b>A. Mete</b>, R. Singh, X. Liu, P. R. Kumar</p>
+                        <p class="cite">Learning for Dynamics and Control <a class="pdf" href="https://proceedings.mlr.press/v144/mete21a/mete21a.pdf">PDF</a> <a class="pdf" href="https://arxiv.org/abs/2011.07738">arXiv</a></p>
+                    </div>
+                </article>
+
+                <h3 class="group">Networks and Cyber-Physical Systems</h3>
+
+                <article class="pub">
+                    <div class="venue"><span class="tag">APEC</span><span class="year">2024</span></div>
+                    <div>
+                        <h4 class="pub-title"><a href="https://ieeexplore.ieee.org/abstract/document/10509340">Cyber-Secure and Safe Operation of Solar Photovoltaic Power Distribution Systems</a></h4>
+                        <p class="authors">J. Kim, H. Ibrahim, S. Wang, <b>A. Mete</b>, L. Xie, P. Enjeti, P. R. Kumar</p>
+                        <p class="cite">IEEE Applied Power Electronics Conference and Exposition <a class="pdf" href="https://ieeexplore.ieee.org/abstract/document/10509340">Paper</a></p>
+                    </div>
+                </article>
+
+                <article class="pub">
+                    <div class="venue"><span class="tag">TOMPECS</span><span class="year">2024</span></div>
+                    <div>
+                        <h4 class="pub-title"><a href="https://hal.science/hal-04443590v1/file/submission.pdf">Partial Server Pooling in Delay Systems</a></h4>
+                        <p class="authors">V. Rohit, <b>A. Mete</b>, D. Manjunath, J. Nair, B. Prabhu</p>
+                        <p class="cite">ACM Transactions on Modeling and Performance Evaluation of Computing Systems <a class="pdf" href="https://hal.science/hal-04443590v1/file/submission.pdf">PDF</a></p>
+                    </div>
+                </article>
+
+                <article class="pub">
+                    <div class="venue"><span class="tag">ITC</span><span class="year">2019</span></div>
+                    <div>
+                        <h4 class="pub-title"><a href="https://ieeexplore.ieee.org/abstract/document/8879441">Partial Server Pooling in Redundancy Systems</a></h4>
+                        <p class="authors"><b>A. Mete</b>, D. Manjunath, J. Nair, B. Prabhu</p>
+                        <p class="cite">International Teletraffic Congress (ITC 31) <a class="pdf" href="https://ieeexplore.ieee.org/abstract/document/8879441">Paper</a> <a class="pdf" href="https://arxiv.org/abs/1906.03587">arXiv</a></p>
+                    </div>
+                </article>
+
+                <article class="pub">
+                    <div class="venue"><span class="tag">COMSNETS</span><span class="year">2019</span></div>
+                    <div>
+                        <h4 class="pub-title"><a href="https://ieeexplore.ieee.org/abstract/document/8711322">Low Latency Scheduling for D2D Communication</a></h4>
+                        <p class="authors"><b>A. Mete</b></p>
+                        <p class="cite">International Conference on Communication Systems &amp; Networks <a class="pdf" href="https://ieeexplore.ieee.org/abstract/document/8711322">Paper</a></p>
+                    </div>
+                </article>
+
+                <article class="pub">
+                    <div class="venue"><span class="tag">MobiCom</span><span class="year">2018</span></div>
+                    <div>
+                        <h4 class="pub-title"><a href="https://dl.acm.org/doi/abs/10.1145/3266276.3266278">Caching Policies for D2D-assisted Content Delivery Systems</a></h4>
+                        <p class="authors"><b>A. Mete</b>, S. Moharir</p>
+                        <p class="cite">Technologies for the Wireless Edge Workshop, MobiCom <a class="pdf" href="https://dl.acm.org/doi/abs/10.1145/3266276.3266278">Paper</a></p>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+
+        <section class="section" id="teaching">
+            <h2>Teaching</h2>
+            <div class="section-body">
+                <div class="entry">
+                    <span class="when">Fall 2026</span>
+                    <div>
+                        <h3 class="entry-title">ECEN 755: Stochastic Systems</h3>
+                        <p class="entry-org">Guest Lecturer, Texas A&amp;M University</p>
+                        <p class="entry-detail">Lectures on dynamic programming: deterministic and stochastic DP, the Hamilton&ndash;Jacobi&ndash;Bellman equation, and infinite-horizon discounted problems.</p>
+                    </div>
+                </div>
+                <div class="entry">
+                    <span class="when">2023</span>
+                    <div>
+                        <h3 class="entry-title">Reinforcement Learning: A Control Theoretic Perspective</h3>
+                        <p class="entry-org">Long tutorial, Indian Control Conference (ICC 2023)</p>
+                    </div>
+                </div>            </div>
+        </section>
+
+        <section class="section" id="talks">
+            <h2>Talks &amp; Service</h2>
+            <div class="section-body">
+                <h3 class="group">Invited Talks</h3>
+                <ul class="plain">
+                    <li><span class="talk-title">From Adaptive Control to Reinforcement Learning</span><span class="talk-where">Seminar, Purdue University</span></li>
+                </ul>
+                <h3 class="group">Reviewing</h3>
+                <p class="venues">
+                    <abbr title="International Conference on Machine Learning">ICML</abbr> &middot;
+                    <abbr title="Neural Information Processing Systems">NeurIPS</abbr> &middot;
+                    <abbr title="International Conference on Artificial Intelligence and Statistics">AISTATS</abbr> &middot;
+                    <abbr title="Association for the Advancement of Artificial Intelligence">AAAI</abbr> &middot;
+                    <abbr title="Learning for Dynamics and Control">L4DC</abbr> &middot;
+                    <abbr title="IEEE Conference on Decision and Control">CDC</abbr> &middot;
+                    <abbr title="American Control Conference">ACC</abbr> &middot;
+                    <abbr title="Indian Control Conference">ICC</abbr>
+                </p>            </div>
+        </section>
+
+        <section class="section" id="background">
+            <h2>Background</h2>
+            <div class="section-body">
+                <div class="entry">
+                    <span class="when">2026 &ndash; now</span>
+                    <div>
+                        <h3 class="entry-title">Postdoctoral Researcher, Electrical and Computer Engineering</h3>
+                        <p class="entry-org">Texas A&amp;M University, College Station, TX</p>
+                        <p class="entry-detail">Host: <a href="https://engineering.tamu.edu/electrical/profiles/pkumar.html">P. R. Kumar</a></p>
+                    </div>
+                </div>
+                <div class="entry">
+                    <span class="when">2019 &ndash; 2026</span>
+                    <div>
+                        <h3 class="entry-title">PhD, Electrical and Computer Engineering</h3>
+                        <p class="entry-org">Texas A&amp;M University, College Station, TX</p>
+                        <p class="entry-detail">Dissertation: <i>The Exploration&ndash;Exploitation Trade-Off in Reinforcement Learning</i><br>
+                        Advisor: <a href="https://engineering.tamu.edu/electrical/profiles/pkumar.html">P. R. Kumar</a></p>                    </div>
+                </div>
+                <div class="entry">
+                    <span class="when">Summer 2024</span>
+                    <div>
+                        <h3 class="entry-title">Research Intern, AT&amp;T Labs</h3>
+                        <p class="entry-org">Network Analytics and Automation Group, Bedminster, NJ</p>
+                        <p class="entry-detail">Reinforcement learning for network slicing. Mentor: <a href="https://www.linkedin.com/in/huahui-wang-26329812">H. Wang</a></p>
+                    </div>
+                </div>
+                <div class="entry">
+                    <span class="when">2013 &ndash; 2018</span>
+                    <div>
+                        <h3 class="entry-title">B.Tech. + M.Tech. (Dual Degree), Electrical Engineering</h3>
+                        <p class="entry-org">Indian Institute of Technology Bombay, Mumbai</p>
+                        <p class="entry-detail">Communication and Signal Processing<br>
+                        Advisors: <a href="https://www.ee.iitb.ac.in/~dmanju/">D. Manjunath</a>, <a href="https://www.ee.iitb.ac.in/~jayakrishnan.nair/">J. Nair</a>, <a href="https://sites.google.com/view/sharayu-homepage/home">S. Moharir</a></p>
                     </div>
                 </div>
             </div>
+        </section>
+
+    </main>
+
+    <footer class="site-footer">
+        <div class="wrap footer-inner">
+            <span>&copy; <span id="year">2026</span> Akshay Mete</span>
+            <span>College Station, TX</span>
         </div>
-    </section>
-
-    <section id="advisors" class="advisors">
-        <div class="container">
-            <h2>Advisors</h2>
-            
-            <div class="advisors-grid">
-                <a href="https://engineering.tamu.edu/electrical/profiles/pkumar.html" target="_blank" class="advisor-card">
-                    <h4>P. R. Kumar</h4>
-                    <p>Texas A&M University</p>
-                    <p>PhD Advisor</p>
-                </a>
-                <a href="https://www.ee.iitb.ac.in/~dmanju/" target="_blank" class="advisor-card">
-                    <h4>D. Manjunath</h4>
-                    <p>IIT Bombay</p>
-                    <p>MS Advisor</p>
-                </a>
-                <a href="https://sites.google.com/view/rsingh12/home" target="_blank" class="advisor-card">
-                    <h4>R. Singh</h4>
-                    <p>IISc Bengaluru</p>
-                    <p>Research Collaborator</p>
-                </a>
-                <a href="https://www.ee.iitb.ac.in/~jayakrishnan.nair/" target="_blank" class="advisor-card">
-                    <h4>J. Nair</h4>
-                    <p>IIT Bombay</p>
-                    <p>MS Advisor</p>
-                </a>
-                <a href="https://sites.google.com/view/sharayu-homepage/home" target="_blank" class="advisor-card">
-                    <h4>S. Moharir</h4>
-                    <p>IIT Bombay</p>
-                    <p>MS Advisor</p>
-                </a>
-                <a href="https://www.linkedin.com/in/huahui-wang-26329812" target="_blank" class="advisor-card">
-                    <h4>H. Wang</h4>
-                    <p>AT&T Labs</p>
-                    <p>Research Internship Mentor</p>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <section id="experience" class="experience">
-        <div class="container">
-            <h2>Professional Experience</h2>
-            <div class="timeline">
-                <div class="timeline-item">
-                    <h3>Research Intern</h3>
-                    <p class="company">Network Analytics and Automation Group, AT&T Labs, Bedminster, NJ, USA</p>
-                    <p class="date">Summer 2024</p>
-                    <p>Reinforcement Learning for Network Slicing</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="education" class="education">
-        <div class="container">
-            <h2>Education</h2>
-            <div class="education-grid">
-                <div class="education-card">
-                    <h3>PhD, Electrical and Computer Engineering</h3>
-                    <p class="institution">Texas A&M University, College Station, TX, USA</p>
-                    <p class="date">2019 - Present</p>
-                    <p>Advisor: Prof. P. R. Kumar</p>
-                    <p>Thesis: The Exploration-Exploitation Trade-Off in Reinforcement Learning</p>
-                </div>
-                <div class="education-card">
-                    <h3>MS + BS (Dual Degree), Electrical Engineering</h3>
-                    <p class="institution">Indian Institute of Technology (IIT) Bombay, Mumbai, India</p>
-                    <p class="date">2013 - 2018</p>
-                    <p>Specialization: Communication and Signal Processing</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="coursework" class="coursework">
-        <div class="container">
-            <h2>Relevant Courses</h2>
-            <div class="coursework-grid">
-                <div class="coursework-card">
-                    <h3>Artificial Intelligence</h3>
-                    <ul>
-                        <li>Reinforcement Learning</li>
-                        <li>Machine Learning</li>
-                        <li>Deep Learning</li>
-                    </ul>
-                </div>
-                <div class="coursework-card">
-                    <h3>Optimization</h3>
-                    <ul>
-                        <li>Convex Optimization</li>
-                        <li>Combinatorial Optimization</li>
-                        <li>Stochastic Optimization</li>
-                    </ul>
-                </div>
-                <div class="coursework-card">
-                    <h3>Control Theory</h3>
-                    <ul>
-                        <li>Stochastic Systems</li>
-                        <li>Adaptive Control</li>
-                        <li>Linear Control Systems</li>
-                    </ul>
-                </div>
-                <div class="coursework-card">
-                    <h3>Mathematics and Statistics</h3>
-                    <ul>
-                        <li>Real Analysis</li>
-                        <li>Stochastic Processes</li>
-                        <li>Graph Theory</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="academic" class="academic">
-        <div class="container">
-            <h2>Academic Activities</h2>
-            
-            <div class="academic-grid">
-                <div class="academic-card">
-                    <h3>Conference Reviewer</h3>
-                    <ul>
-                        <li>International Conference on Machine Learning (ICML)</li>
-                        <li>Neural Information Processing Systems (NeurIPS)</li>
-                        <li>International Conference on Artificial Intelligence and Statistics (AISTATS)</li>
-                        <li>Association for the Advancement of Artificial Intelligence (AAAI)</li>
-                        <li>Learning for Dynamics and Control (L4DC)</li>
-                        <li>IEEE Conference on Decision and Control (CDC)</li>
-                        <li>American Control Conference (ACC)</li>
-                        <li>Indian Control Conference (ICC)</li>
-                    </ul>
-                </div>
-
-                <div class="academic-card">
-                    <h3>Seminars & Tutorials</h3>
-                    <ul>
-                        <li>"Reinforcement Learning: A Control Theoretic Perspective", Long Tutorial, ICC 2023</li>
-                        <li>"From Adaptive Control to Reinforcement Learning", Purdue University</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="contact" class="contact">
-        <div class="container">
-            <h2>Get in Touch</h2>
-            <div class="contact-content">
-                <div class="contact-info">
-                    <div class="contact-item">
-                        <i class="fas fa-envelope"></i>
-                        <p>lastnamefirstname@gmail.com</p>
-                    </div>
-                    <div class="contact-item">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <p>College Station, TX, USA</p>
-                    </div>
-                    <div class="social-links">
-                        <a href="https://linkedin.com/in/akshaymete" class="social-link"><i class="fab fa-linkedin"></i></a>
-                        <a href="https://scholar.google.com/citations?user=evLF1akAAAAJ&hl" class="social-link"><i class="fas fa-graduation-cap"></i></a>
-                        <a href="https://github.com/akshaymete" class="social-link"><i class="fab fa-github"></i></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="services" class="services">
-        <div class="container">
-            <div class="footer-content">
-                <p class="copyright">&copy; 2025 Akshay Mete. All rights reserved.</p>
-            </div>
-        </div>
-    </section>
+    </footer>
 
     <script src="script.js"></script>
 </body>
-</html> 
+</html>

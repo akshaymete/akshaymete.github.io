@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Links to the paper and code are added once they are public. -->
+    <title>OpTTA: Optimistic Test-Time World Model Adaptation</title>
+    <meta name="description" content="OpTTA adapts a latent world model at test time with a prediction loss plus a task-aware optimistic planning loss, improving goal-conditioned planning under distribution shift across three JEPA world models.">
+    <link rel="canonical" href="https://akshaymete.com/projects/optta/">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Adapt for Planning, Not Just Prediction: Optimistic Test-Time World Model Adaptation">
+    <meta property="og:description" content="Test-time adaptation of world models for planning benefits from an optimistic, task-aware term in addition to the prediction loss.">
+    <meta property="og:url" content="https://akshaymete.com/projects/optta/">
+    <meta property="og:image" content="https://akshaymete.com/projects/optta/assets/method.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/katex.min.css">
+    <script>
+        try {
+            var saved = localStorage.getItem('theme');
+            if (saved) document.documentElement.setAttribute('data-theme', saved);
+        } catch (e) {}
+    </script>
+    <style>
+        :root {
+            --bg: #fbfaf6;
+            --ink: #1b1a17;
+            --text: #3b3934;
+            --muted: #6d695f;
+            --rule: #e5e1d6;
+            --accent: #7b1f24;
+            --accent-soft: rgba(123, 31, 36, 0.07);
+            --plate: #ffffff;
+            --code-bg: #f3f1ea;
+            --nav-bg: rgba(251, 250, 246, 0.86);
+            --shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 28px -14px rgba(0, 0, 0, 0.3);
+            --serif: "Newsreader", "Iowan Old Style", Georgia, serif;
+            --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+            --mono: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
+            color-scheme: light;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg: #131211;
+                --ink: #efece6;
+                --text: #cfcbc2;
+                --muted: #9a958b;
+                --rule: #2b2926;
+                --accent: #e3a3a3;
+                --accent-soft: rgba(227, 163, 163, 0.1);
+                --plate: #f4f2ec;
+                --code-bg: #1c1b19;
+                --nav-bg: rgba(19, 18, 17, 0.82);
+                --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -14px rgba(0, 0, 0, 0.8);
+                color-scheme: dark;
+            }
+        }
+        :root[data-theme="dark"] {
+            --bg: #131211;
+            --ink: #efece6;
+            --text: #cfcbc2;
+            --muted: #9a958b;
+            --rule: #2b2926;
+            --accent: #e3a3a3;
+            --accent-soft: rgba(227, 163, 163, 0.1);
+            --plate: #f4f2ec;
+            --code-bg: #1c1b19;
+            --nav-bg: rgba(19, 18, 17, 0.82);
+            --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -14px rgba(0, 0, 0, 0.8);
+            color-scheme: dark;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+        html { scroll-behavior: smooth; scroll-padding-top: 76px; -webkit-text-size-adjust: 100%; }
+        @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--serif);
+            font-size: 1.125rem;
+            line-height: 1.6;
+            font-optical-sizing: auto;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+        a {
+            color: var(--accent);
+            text-decoration: underline;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 0.18em;
+            text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+        }
+        a:hover { text-decoration-color: currentColor; }
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+        b, strong { font-weight: 600; color: var(--ink); }
+
+        .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+        .skip-link { position: absolute; left: -9999px; }
+        .skip-link:focus { left: 16px; top: 12px; z-index: 20; background: var(--bg); padding: 6px 10px; }
+
+        /* nav */
+        .site-nav {
+            position: sticky; top: 0; z-index: 10;
+            background: var(--nav-bg);
+            -webkit-backdrop-filter: saturate(160%) blur(10px);
+            backdrop-filter: saturate(160%) blur(10px);
+            border-bottom: 1px solid var(--rule);
+        }
+        .nav-inner { display: flex; align-items: center; gap: 24px; height: 60px; }
+        .brand { margin-right: auto; font-family: var(--serif); font-size: 1.15rem; font-weight: 600; letter-spacing: -0.01em; color: var(--ink); text-decoration: none; }
+        .theme-toggle {
+            display: grid; place-items: center; width: 34px; height: 34px; padding: 0;
+            border: 1px solid var(--rule); border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer;
+        }
+        .theme-toggle:hover { color: var(--ink); border-color: var(--muted); }
+        .icon-sun { display: none; }
+        :root[data-theme="dark"] .icon-sun { display: block; }
+        :root[data-theme="dark"] .icon-moon { display: none; }
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .icon-sun { display: block; }
+            :root:not([data-theme="light"]) .icon-moon { display: none; }
+        }
+
+        /* hero */
+        .hero { padding: 64px 0 30px; text-align: center; }
+        .kicker { margin: 0 0 18px; font-family: var(--sans); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+        h1 { margin: 0 auto 22px; max-width: 820px; font-family: var(--serif); font-size: clamp(1.9rem, 4.2vw, 2.7rem); font-weight: 500; line-height: 1.12; letter-spacing: -0.02em; color: var(--ink); }
+        h1 .sub { display: block; font-weight: 400; font-style: italic; color: var(--text); font-size: 0.82em; margin-top: 6px; letter-spacing: -0.01em; }
+        .authors { margin: 0 0 4px; font-size: 1.125rem; color: var(--ink); }
+        .authors a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--rule); }
+        .authors a:hover { color: var(--accent); border-color: var(--accent); }
+        .affil { margin: 0 0 6px; font-family: var(--sans); font-size: 0.9375rem; color: var(--muted); }
+        .venue-note { margin: 0 0 26px; font-family: var(--sans); font-size: 0.84375rem; color: var(--muted); }
+        .venue-note a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--rule); }
+        .venue-note a:hover { color: var(--accent); border-color: var(--accent); }
+        .buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 0; padding: 0; list-style: none; }
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px;
+            border: 1px solid var(--rule); border-radius: 999px;
+            font-family: var(--sans); font-size: 0.875rem; font-weight: 500; color: var(--ink); text-decoration: none; background: transparent;
+            transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+        }
+        .btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+        .btn svg { width: 15px; height: 15px; }
+        .tldr { max-width: 720px; margin: 34px auto 0; font-size: 1.1875rem; line-height: 1.55; color: var(--ink); text-align: left; }
+        .tldr-label { display: inline-block; margin-right: 10px; padding: 2px 7px; border-radius: 3px; background: var(--accent-soft); font-family: var(--sans); font-size: 0.71875rem; font-weight: 600; letter-spacing: 0.06em; color: var(--accent); vertical-align: 0.15em; }
+
+        /* figures */
+        figure { margin: 0; }
+        .plate { background: var(--plate); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 16px; box-shadow: var(--shadow); }
+        .plate img { display: block; width: 100%; height: auto; }
+        figcaption { margin: 12px 4px 0; font-family: var(--sans); font-size: 0.84375rem; line-height: 1.55; color: var(--muted); text-align: center; }
+        figcaption b { color: var(--text); font-weight: 600; }
+        .teaser { padding: 16px 0 0; }
+
+        /* sections */
+        .section { padding: 56px 0 0; }
+        h2 { margin: 0 0 22px; font-family: var(--serif); font-size: 1.5rem; font-weight: 500; line-height: 1.2; letter-spacing: -0.01em; color: var(--ink); text-align: center; }
+        h3 { margin: 44px 0 16px; font-family: var(--serif); font-size: 1.1875rem; font-weight: 600; line-height: 1.3; color: var(--ink); text-align: center; }
+        .lede { max-width: 760px; margin: 44px auto 0; font-size: 1.25rem; line-height: 1.5; color: var(--ink); text-align: center; }
+        .takeaway { max-width: 760px; margin: 18px auto 0; font-size: 1.0625rem; line-height: 1.55; text-align: center; }
+        .prose { max-width: 760px; margin: 0 auto 16px; font-size: 1.0625rem; line-height: 1.6; }
+        .prose + .eqcard { margin-top: 24px; }
+        .eqcard + .prose { margin-top: 20px; }
+        .takeaway b { color: var(--ink); }
+
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 34px 0 0; }
+        .stat { padding: 18px 18px 16px; border: 1px solid var(--rule); border-radius: 6px; text-align: center; }
+        .stat .num { display: block; font-family: var(--serif); font-size: 2.1rem; font-weight: 500; line-height: 1.05; letter-spacing: -0.02em; color: var(--ink); font-variant-numeric: tabular-nums; }
+        .stat .num small { font-size: 0.5em; font-weight: 400; color: var(--muted); letter-spacing: 0; }
+        .stat .lbl { display: block; margin-top: 8px; font-family: var(--sans); font-size: 0.78125rem; line-height: 1.45; color: var(--muted); }
+
+        /* equation card */
+        .eqcard { padding: 26px 20px 8px; border: 1px solid var(--rule); border-radius: 6px; }
+        .eq { margin: 0; overflow-x: auto; overflow-y: hidden; padding: 6px 0 10px; text-align: center; }
+        .eq .katex { font-size: 1.22em; }
+        .eq .katex .mathrm, .eq .katex .text { color: inherit; }
+        .eq-narrow { display: none; }
+        @media (max-width: 600px) {
+            .eq-wide { display: none; }
+            .eq-narrow { display: block; }
+            .eq .katex { font-size: 1.08em; }
+        }
+        .terms { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin: 10px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--rule); }
+        .terms li { padding: 18px 16px 16px; font-family: var(--sans); font-size: 0.84375rem; line-height: 1.5; color: var(--muted); }
+        .terms li + li { border-left: 1px solid var(--rule); }
+        .terms b { display: block; margin-bottom: 4px; font-size: 0.875rem; color: var(--ink); }
+        .terms .katex { font-size: 1em; }
+        .terms .mini { margin: 10px 0 0; overflow-x: auto; overflow-y: hidden; padding-bottom: 2px; scrollbar-width: none; color: var(--text); }
+        .terms .mini::-webkit-scrollbar { display: none; }
+        .terms .mini .katex { font-size: 0.95em; }
+
+        /* results figure + collapsibles */
+        details { margin: 18px 0 0; border: 1px solid var(--rule); border-radius: 6px; }
+        summary { padding: 12px 16px; cursor: pointer; list-style: none; font-family: var(--sans); font-size: 0.84375rem; font-weight: 500; color: var(--ink); display: flex; align-items: center; gap: 10px; }
+        summary::-webkit-details-marker { display: none; }
+        summary::before { content: ""; width: 7px; height: 7px; border-right: 1.6px solid var(--muted); border-bottom: 1.6px solid var(--muted); transform: rotate(-45deg); transition: transform 0.15s ease; margin-left: 2px; }
+        details[open] summary::before { transform: rotate(45deg); }
+        details > :not(summary) { padding: 0 16px 16px; }
+        details p { margin: 0; font-size: 1.0625rem; }
+
+        .tabs { display: inline-flex; gap: 4px; margin: 4px 0 12px; padding: 4px; border: 1px solid var(--rule); border-radius: 999px; }
+        .tabs button {
+            border: 0; background: transparent; padding: 7px 14px; border-radius: 999px; cursor: pointer;
+            font-family: var(--sans); font-size: 0.8125rem; font-weight: 500; color: var(--muted);
+        }
+        .tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+        .table-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; }
+        table.results { width: 100%; border-collapse: collapse; font-family: var(--sans); font-size: 0.8125rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+        table.results th, table.results td { padding: 7px 10px; text-align: right; border-bottom: 1px solid var(--rule); }
+        table.results thead th { font-weight: 600; color: var(--ink); background: color-mix(in srgb, var(--rule) 40%, transparent); }
+        table.results thead tr:first-child th { text-align: center; }
+        table.results thead tr:first-child th:first-child { text-align: left; }
+        table.results th[scope="row"] { text-align: left; font-weight: 500; color: var(--text); }
+        table.results tr.grp th { text-align: left; font-weight: 600; font-style: italic; color: var(--muted); background: transparent; padding-top: 10px; }
+        table.results td:nth-child(5), table.results thead tr:last-child th:nth-child(4), table.results thead tr:first-child th:nth-child(3) { border-left: 1px solid var(--rule); }
+        table.results td.best { font-weight: 600; color: var(--ink); }
+        table.results small { font-size: 0.78em; color: var(--muted); margin-left: 1px; }
+        table.results .gain { margin-left: 5px; font-size: 0.82em; color: var(--muted); }
+        table.results tbody tr:last-child td, table.results tbody tr:last-child th { border-bottom: 0; }
+        .n { color: var(--muted); font-weight: 400; }
+        .tnote { margin: 10px 4px 0; font-family: var(--sans); font-size: 0.8125rem; line-height: 1.55; color: var(--muted); }
+
+        .crop { position: relative; overflow: hidden; }
+        .crop img { position: absolute; display: block; height: auto; max-width: none; }
+        .crop-legend { width: 240px; max-width: 70%; aspect-ratio: 160 / 14; margin: 2px auto 10px; }
+        .crop-legend img { width: 247.5%; left: -75%; top: 0; }
+        .crop-success { aspect-ratio: 96 / 165; }
+        .crop-success img { width: 412.5%; left: 0; top: -7.273%; }
+        .crop-optimism { aspect-ratio: 98 / 165; }
+        .crop-optimism img { width: 404.08%; left: -304.08%; top: -7.273%; }
+        .diag-grid { display: grid; grid-template-columns: 96fr 98fr; gap: 28px; max-width: 620px; margin: 0 auto; }
+        .abl-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }        .abl-grid .plate { padding: 10px; }
+        .abl-grid figcaption { margin-top: 10px; }
+
+        /* bibtex */
+        .bib { position: relative; margin: 0; padding: 18px 20px; background: var(--code-bg); border: 1px solid var(--rule); border-radius: 6px; font-family: var(--mono); font-size: 0.8125rem; line-height: 1.55; color: var(--text); overflow-x: auto; }
+        .copy { position: absolute; top: 10px; right: 10px; padding: 5px 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--bg); color: var(--muted); font-family: var(--sans); font-size: 0.75rem; font-weight: 500; cursor: pointer; }
+        .copy:hover { color: var(--ink); border-color: var(--muted); }
+        .credit { margin: 14px 4px 0; font-family: var(--sans); font-size: 0.8125rem; line-height: 1.55; color: var(--muted); text-align: center; }
+
+        .site-footer { margin-top: 64px; border-top: 1px solid var(--rule); }
+        .footer-inner { display: flex; justify-content: space-between; gap: 16px; padding: 26px 24px 40px; font-family: var(--sans); font-size: 0.8125rem; color: var(--muted); }
+        .footer-inner a { color: inherit; }
+
+        @media (max-width: 820px) {
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .terms { grid-template-columns: 1fr; }
+            .terms li + li { border-left: 0; border-top: 1px solid var(--rule); }
+        }
+        @media (max-width: 760px) {
+            .nav-inner { gap: 14px; }
+            .hero { padding: 44px 0 20px; }
+            .abl-grid { grid-template-columns: 1fr; }
+            .plate { padding: 10px; }
+            .lede { font-size: 1.125rem; margin-top: 32px; }
+            .section { padding-top: 44px; }
+            .footer-inner { flex-direction: column; gap: 4px; }
+        }
+        @media (max-width: 480px) {
+            body { font-size: 1.0625rem; }
+            .wrap { padding: 0 16px; }
+            .stats { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .stat { padding: 14px 10px 12px; }
+            .stat .num { font-size: 1.7rem; }
+            .footer-inner { padding-left: 16px; padding-right: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-nav">
+        <div class="wrap nav-inner">
+            <a class="brand" href="https://akshaymete.com/">Akshay Mete</a>
+            <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle dark mode">
+                <svg class="icon-moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+                <svg class="icon-sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <main id="main" class="wrap">
+
+        <section class="hero" id="top">
+            <h1>Adapt for Planning, Not Just Prediction
+                <span class="sub">Optimistic Test-Time World Model Adaptation</span>
+            </h1>
+            <p class="authors">
+                <a href="https://akshaymete.com/">Akshay Mete</a>,
+                Dileep Kalathil,
+                <a href="https://engineering.tamu.edu/electrical/profiles/pkumar.html">P.&nbsp;R.&nbsp;Kumar</a>
+            </p>
+            <p class="affil">Texas A&amp;M University</p>
+            <p class="venue-note">To appear at the <a href="https://corl2026-robotcl.github.io/">Pretrain to Adapt</a> workshop, CoRL 2026</p>
+            <ul class="buttons">
+                <li><a class="btn" href="https://arxiv.org/abs/2610.35636"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M14 3v5h5M9 13h7M9 17h7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>arXiv</a></li>
+                <li><a class="btn" href="https://arxiv.org/pdf/2610.35636"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v3h14v-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>PDF</a></li>
+                <li><a class="btn" href="https://github.com/akshaymete/optta"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Code</a></li>
+                <li><a class="btn" href="#bibtex"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h10v14l-5-3-5 3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>BibTeX</a></li>
+            </ul>            <p class="tldr"><span class="tldr-label">TL;DR</span>Adapted to prediction alone, a world model is fit only to the outcomes of its own actions and can remain wrong about the actions that would reach the goal. OpTTA estimates the model with a task-aware, optimistic objective: the prediction loss on observed transitions plus the planner's goal-reaching cost on its own candidate rollouts. Across three JEPA world models and 15 shifted settings, it raises final planning success over the frozen model by 13.5 points on average, against 6.9 for prediction-only adaptation.</p>
+        </section>
+
+        <section class="teaser">
+            <figure>
+                <div class="plate"><img src="assets/method.svg" alt="Diagram of the OpTTA loop. Execution row: the world model takes the goal image and current observation, produces imagined rollouts, the planner picks an action, the environment returns the next observation. Adaptation row: the prediction loss on buffered transitions plus the optimism-weighted planning loss on the candidate rollouts update the world model. Steps: plan, execute, optimistic adaptation, replan." width="1180" height="478"></div>
+                <figcaption>Plan, execute, adapt, replan. At every replanning step the world model is adapted on the observed transitions, using the prediction loss plus the <b>task-aware optimistic loss evaluated on the candidate rollouts the planner has already generated</b>.</figcaption>
+            </figure>
+
+            <div class="stats" aria-label="Headline numbers">
+                <div class="stat"><span class="num">13.5 <small>vs 6.9 pts</small></span><span class="lbl">Average gain in final success over the frozen model, OpTTA vs prediction-only (AdaJEPA)</span></div>
+                <div class="stat"><span class="num">14 <small>of 15</small></span><span class="lbl">Shifted settings where OpTTA ends higher than AdaJEPA</span></div>
+                <div class="stat"><span class="num">3 <small>world models</small></span><span class="lbl">LeWM, DINO-WM, temporal straightening; CEM and gradient-based planners</span></div>
+                <div class="stat"><span class="num">0 <small>added interaction</small></span><span class="lbl">No additional environment interaction; about 20 ms more per replan</span></div>
+            </div>
+
+        </section>
+
+        <section class="section" id="results">
+            <h2>Optimism improves planning under distribution shift</h2>
+            <figure>
+                <div class="plate"><img src="assets/gains.svg" alt="Bar chart of gain in final planning success over the frozen model for AdaJEPA and OpTTA across eight settings with the predictor adapted and seven with predictor and encoder adapted. OpTTA's bars are higher in every setting except LeWM TwoRoom, where both are negative." width="1280" height="300"></div>
+                <figcaption>Gain in final planning success over the frozen model, averaged over the shifts of each setting. Blue: prediction-only adaptation (AdaJEPA). Orange: OpTTA. Error bars: &plusmn;1 s.e. over seeds.</figcaption>
+            </figure>
+            <p class="takeaway">Both methods share the checkpoint, planner, episodes, buffer, adapted parameters and update schedule; only the adaptation objective differs. OpTTA reaches higher final success in <b>14 of 15</b> shifted settings and higher mean success over replans in <b>13 of 15</b>. TwoRoom is the exception, where both objectives fall below the frozen model.</p>
+            <details>
+                <summary>Full results table</summary>
+                <div>
+                    <div class="tabs" role="tablist" aria-label="Adaptation scope">
+                        <button role="tab" id="tab-pred" aria-selected="true" aria-controls="tb-pred" type="button">Predictor adapted</button>
+                        <button role="tab" id="tab-enc" aria-selected="false" aria-controls="tb-enc" type="button">Predictor and encoder adapted</button>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="results">
+                            <thead>
+                                <tr><th rowspan="2" scope="col">Setting <span class="n">(shifts)</span></th><th colspan="3" scope="colgroup">Final</th><th colspan="3" scope="colgroup">Mean over replans</th></tr>
+                                <tr><th scope="col">Frozen</th><th scope="col">AdaJEPA</th><th scope="col">OpTTA</th><th scope="col">Frozen</th><th scope="col">AdaJEPA</th><th scope="col">OpTTA</th></tr>
+                            </thead>
+                            <tbody id="tb-pred" role="tabpanel" aria-labelledby="tab-pred">
+<tr class="grp"><th colspan="7">In distribution</th></tr>
+<tr><th scope="row">LeWM PushT</th><td>80.0<small>±2.5</small></td><td>88.8<small>±1.4</small><span class="gain">(+8.8)</span></td><td class="best">92.0<small>±1.9</small><span class="gain">(+12.0)</span></td><td>59.1<small>±1.1</small></td><td>66.7<small>±1.3</small><span class="gain">(+7.6)</span></td><td class="best">71.5<small>±1.9</small><span class="gain">(+12.4)</span></td></tr>
+<tr><th scope="row">LeWM Reacher</th><td>98.4<small>±0.7</small></td><td>98.8<small>±0.8</small><span class="gain">(+0.4)</span></td><td class="best">100.0<small>±0.0</small><span class="gain">(+1.6)</span></td><td>75.6<small>±0.9</small></td><td>75.3<small>±1.5</small><span class="gain neg">(−0.3)</span></td><td class="best">77.6<small>±0.6</small><span class="gain">(+2.0)</span></td></tr>
+<tr><th scope="row">LeWM TwoRoom</th><td class="best">93.6<small>±1.3</small></td><td>93.2<small>±1.2</small><span class="gain neg">(−0.4)</span></td><td>91.2<small>±0.5</small><span class="gain neg">(−2.4)</span></td><td class="best">80.7<small>±0.8</small></td><td>79.7<small>±1.0</small><span class="gain neg">(−1.0)</span></td><td>79.0<small>±0.7</small><span class="gain neg">(−1.7)</span></td></tr>
+<tr><th scope="row">TS PushT</th><td>68.4<small>±2.3</small></td><td>81.6<small>±2.5</small><span class="gain">(+13.2)</span></td><td class="best">91.6<small>±1.9</small><span class="gain">(+23.2)</span></td><td>49.4<small>±1.2</small></td><td>55.9<small>±1.1</small><span class="gain">(+6.5)</span></td><td class="best">66.1<small>±1.3</small><span class="gain">(+16.7)</span></td></tr>
+<tr><th scope="row">DINO-WM PushT</th><td>76.7<small>±3.5</small></td><td>77.3<small>±5.2</small><span class="gain">(+0.7)</span></td><td class="best">81.3<small>±4.7</small><span class="gain">(+4.7)</span></td><td>58.9<small>±2.2</small></td><td>59.7<small>±5.0</small><span class="gain">(+0.8)</span></td><td class="best">63.1<small>±3.9</small><span class="gain">(+4.2)</span></td></tr>
+<tr class="grp"><th colspan="7">Visual corruptions</th></tr>
+<tr><th scope="row">LeWM PushT <span class="n">(7)</span></th><td>58.5<small>±0.8</small></td><td>62.4<small>±1.0</small><span class="gain">(+3.9)</span></td><td class="best">68.5<small>±0.6</small><span class="gain">(+10.0)</span></td><td>43.9<small>±0.7</small></td><td>47.3<small>±0.6</small><span class="gain">(+3.5)</span></td><td class="best">52.9<small>±0.5</small><span class="gain">(+9.0)</span></td></tr>
+<tr><th scope="row">LeWM Reacher <span class="n">(7)</span></th><td>52.8<small>±0.5</small></td><td>60.3<small>±0.5</small><span class="gain">(+7.5)</span></td><td class="best">70.8<small>±0.7</small><span class="gain">(+18.0)</span></td><td>38.4<small>±0.6</small></td><td>40.6<small>±0.5</small><span class="gain">(+2.2)</span></td><td class="best">47.2<small>±0.8</small><span class="gain">(+8.8)</span></td></tr>
+<tr><th scope="row">LeWM TwoRoom <span class="n">(7)</span></th><td class="best">61.0<small>±1.7</small></td><td>57.6<small>±1.5</small><span class="gain neg">(−3.4)</span></td><td>57.2<small>±1.5</small><span class="gain neg">(−3.8)</span></td><td class="best">51.9<small>±1.8</small></td><td>49.3<small>±1.6</small><span class="gain neg">(−2.6)</span></td><td>49.3<small>±1.5</small><span class="gain neg">(−2.6)</span></td></tr>
+<tr><th scope="row">TS PushT <span class="n">(7)</span></th><td>47.8<small>±1.5</small></td><td>58.3<small>±1.2</small><span class="gain">(+10.4)</span></td><td class="best">74.0<small>±1.3</small><span class="gain">(+26.1)</span></td><td>34.0<small>±1.3</small></td><td>38.2<small>±1.1</small><span class="gain">(+4.2)</span></td><td class="best">49.5<small>±1.1</small><span class="gain">(+15.6)</span></td></tr>
+<tr><th scope="row">DINO-WM PushT <span class="n">(7)</span></th><td>45.3<small>±3.0</small></td><td>57.1<small>±4.5</small><span class="gain">(+11.8)</span></td><td class="best">58.8<small>±3.2</small><span class="gain">(+13.4)</span></td><td>34.2<small>±2.4</small></td><td>42.7<small>±4.0</small><span class="gain">(+8.5)</span></td><td class="best">44.8<small>±2.5</small><span class="gain">(+10.6)</span></td></tr>
+<tr class="grp"><th colspan="7">Environment shifts (TS)</th></tr>
+<tr><th scope="row">PushT recolors <span class="n">(3)</span></th><td>38.1<small>±1.7</small></td><td>40.8<small>±1.6</small><span class="gain">(+2.7)</span></td><td class="best">55.2<small>±0.8</small><span class="gain">(+17.1)</span></td><td>27.4<small>±1.1</small></td><td>26.9<small>±0.6</small><span class="gain neg">(−0.5)</span></td><td class="best">36.4<small>±0.8</small><span class="gain">(+9.0)</span></td></tr>
+<tr><th scope="row">PushObj shapes <span class="n">(3)</span></th><td>34.7<small>±1.6</small></td><td>55.2<small>±2.0</small><span class="gain">(+20.5)</span></td><td class="best">58.3<small>±1.9</small><span class="gain">(+23.6)</span></td><td>24.5<small>±1.0</small></td><td>38.2<small>±1.7</small><span class="gain">(+13.7)</span></td><td class="best">43.0<small>±1.3</small><span class="gain">(+18.5)</span></td></tr>
+<tr><th scope="row">Maze dynamics <span class="n">(2)</span></th><td>85.6<small>±1.7</small></td><td>87.6<small>±2.0</small><span class="gain">(+2.0)</span></td><td class="best">89.2<small>±1.4</small><span class="gain">(+3.6)</span></td><td>66.5<small>±1.1</small></td><td>68.2<small>±1.3</small><span class="gain">(+1.7)</span></td><td class="best">68.8<small>±1.2</small><span class="gain">(+2.3)</span></td></tr>
+                            </tbody>
+                            <tbody id="tb-enc" role="tabpanel" aria-labelledby="tab-enc" hidden>
+<tr class="grp"><th colspan="7">In distribution</th></tr>
+<tr><th scope="row">LeWM PushT</th><td>80.0<small>±2.5</small></td><td>86.8<small>±1.5</small><span class="gain">(+6.8)</span></td><td class="best">90.4<small>±1.7</small><span class="gain">(+10.4)</span></td><td>59.1<small>±1.1</small></td><td>65.6<small>±1.9</small><span class="gain">(+6.5)</span></td><td class="best">70.7<small>±2.0</small><span class="gain">(+11.6)</span></td></tr>
+<tr><th scope="row">LeWM Reacher</th><td>98.4<small>±0.7</small></td><td>99.2<small>±0.5</small><span class="gain">(+0.8)</span></td><td class="best">100.0<small>±0.0</small><span class="gain">(+1.6)</span></td><td>75.6<small>±0.9</small></td><td>74.7<small>±1.2</small><span class="gain neg">(−0.9)</span></td><td class="best">77.1<small>±0.6</small><span class="gain">(+1.5)</span></td></tr>
+<tr><th scope="row">LeWM TwoRoom</th><td class="best">93.6<small>±1.3</small></td><td>92.4<small>±1.0</small><span class="gain neg">(−1.2)</span></td><td>91.6<small>±0.7</small><span class="gain neg">(−2.0)</span></td><td class="best">80.7<small>±0.8</small></td><td>79.0<small>±0.8</small><span class="gain neg">(−1.7)</span></td><td>79.7<small>±0.8</small><span class="gain neg">(−1.1)</span></td></tr>
+<tr><th scope="row">TS PushT</th><td>68.4<small>±2.3</small></td><td>83.2<small>±2.9</small><span class="gain">(+14.8)</span></td><td class="best">90.8<small>±1.6</small><span class="gain">(+22.4)</span></td><td>49.4<small>±1.2</small></td><td>56.8<small>±2.7</small><span class="gain">(+7.4)</span></td><td class="best">67.2<small>±0.8</small><span class="gain">(+17.8)</span></td></tr>
+<tr class="grp"><th colspan="7">Visual corruptions</th></tr>
+<tr><th scope="row">LeWM PushT <span class="n">(7)</span></th><td>58.5<small>±0.8</small></td><td>63.5<small>±0.8</small><span class="gain">(+5.0)</span></td><td class="best">68.4<small>±1.0</small><span class="gain">(+9.9)</span></td><td>43.9<small>±0.7</small></td><td>47.9<small>±0.7</small><span class="gain">(+4.1)</span></td><td class="best">53.0<small>±0.8</small><span class="gain">(+9.2)</span></td></tr>
+<tr><th scope="row">LeWM Reacher <span class="n">(7)</span></th><td>52.8<small>±0.5</small></td><td>62.3<small>±1.1</small><span class="gain">(+9.5)</span></td><td class="best">70.5<small>±1.0</small><span class="gain">(+17.7)</span></td><td>38.4<small>±0.6</small></td><td>41.7<small>±0.7</small><span class="gain">(+3.2)</span></td><td class="best">47.1<small>±0.7</small><span class="gain">(+8.7)</span></td></tr>
+<tr><th scope="row">LeWM TwoRoom <span class="n">(7)</span></th><td class="best">61.0<small>±1.7</small></td><td>57.1<small>±1.2</small><span class="gain neg">(−3.8)</span></td><td>58.4<small>±1.4</small><span class="gain neg">(−2.6)</span></td><td class="best">51.9<small>±1.8</small></td><td>49.0<small>±1.6</small><span class="gain neg">(−2.9)</span></td><td>50.1<small>±1.5</small><span class="gain neg">(−1.8)</span></td></tr>
+<tr><th scope="row">TS PushT <span class="n">(7)</span></th><td>47.8<small>±1.5</small></td><td>60.7<small>±1.9</small><span class="gain">(+12.9)</span></td><td class="best">74.7<small>±1.5</small><span class="gain">(+26.9)</span></td><td>34.0<small>±1.3</small></td><td>39.6<small>±1.4</small><span class="gain">(+5.6)</span></td><td class="best">50.8<small>±1.2</small><span class="gain">(+16.8)</span></td></tr>
+<tr class="grp"><th colspan="7">Environment shifts (TS)</th></tr>
+<tr><th scope="row">PushT recolors <span class="n">(3)</span></th><td>38.1<small>±1.7</small></td><td>44.5<small>±1.3</small><span class="gain">(+6.4)</span></td><td class="best">54.9<small>±1.7</small><span class="gain">(+16.8)</span></td><td>27.4<small>±1.1</small></td><td>29.7<small>±1.0</small><span class="gain">(+2.3)</span></td><td class="best">36.9<small>±1.5</small><span class="gain">(+9.5)</span></td></tr>
+<tr><th scope="row">PushObj shapes <span class="n">(3)</span></th><td>34.7<small>±1.6</small></td><td>55.5<small>±1.1</small><span class="gain">(+20.8)</span></td><td class="best">57.9<small>±2.0</small><span class="gain">(+23.2)</span></td><td>24.5<small>±1.0</small></td><td>38.1<small>±1.3</small><span class="gain">(+13.6)</span></td><td class="best">42.5<small>±1.7</small><span class="gain">(+18.0)</span></td></tr>
+<tr><th scope="row">Maze dynamics <span class="n">(2)</span></th><td>85.6<small>±1.7</small></td><td>87.6<small>±1.7</small><span class="gain">(+2.0)</span></td><td class="best">88.2<small>±1.7</small><span class="gain">(+2.6)</span></td><td>66.5<small>±1.1</small></td><td class="best">68.0<small>±1.2</small><span class="gain">(+1.5)</span></td><td>67.7<small>±1.1</small><span class="gain">(+1.2)</span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="tnote">Success rate in percent, mean &plusmn; standard error over seeds. <b>Final</b> is the success rate after the last of 30 replanning steps; <b>Mean over replans</b> averages cumulative success over all 30 steps, so it rewards solving tasks early. Parentheses give the gain over the frozen model. Visual-corruption rows average four severity levels (DINO-WM: one level, three seeds). TS is temporal straightening.</p>
+                </div>
+            </details>
+        </section>
+
+        <section class="section" id="question">
+            <h2>Which objective should guide test-time adaptation for planning?</h2>
+            <p class="prose">Latent world models are pre-trained offline and kept frozen at test time, so planning with them degrades under distribution shift. Test-time adaptation updates the model during deployment, in a closed loop: the planner acts on the model's rollouts, and the resulting transitions drive the next update. Under a prediction-only objective the model is fit only to the outcomes of its own actions, so it can remain wrong about the actions that would reach the goal, and low prediction error need not translate into better planning.</p>
+        </section>
+
+        <section class="section" id="method">
+            <h2>Optimistic test-time adaptation</h2>
+            <p class="prose">OpTTA formulates test-time adaptation as task-aware, optimistic model estimation, inspired by reward-biased maximum likelihood from adaptive control. Optimism enters through the estimation objective itself, without confidence sets or explicit uncertainty estimates, and the objective assumes no particular world-model architecture or planner.</p>
+            <div class="eqcard">
+                <div class="eq eq-wide">$$\mathcal{L}_{\mathrm{OpTTA}}
+                    \;=\;\underbrace{\mathcal{L}_{\mathrm{pred}}(\mathcal{B})}_{\text{prediction loss on observed transitions}}
+                    \;+\;\underbrace{\alpha_k\,\mathcal{L}_{\mathrm{plan}}(\mathcal{P}_\theta)}_{\text{goal-reaching cost of the candidate rollouts}}$$</div>
+                <div class="eq eq-narrow">$$\begin{aligned}\mathcal{L}_{\mathrm{OpTTA}}
+                    \;=\;{}&\underbrace{\mathcal{L}_{\mathrm{pred}}(\mathcal{B})}_{\text{prediction loss on observed transitions}}\\[1.1em]
+                    {}+{}&\underbrace{\alpha_k\,\mathcal{L}_{\mathrm{plan}}(\mathcal{P}_\theta)}_{\text{goal-reaching cost of the candidate rollouts}}\end{aligned}$$</div>
+                <ul class="terms">
+                    <li><b>Prediction term</b>Latent prediction loss on the buffer \(\mathcal{B}\) of recent observed transitions; it keeps the model estimate grounded in what was observed. \(\alpha_k=0\) is prediction-only adaptation (AdaJEPA).</li>
+                    <li><b>Planning term</b>Average goal-reaching cost of the planner's candidate rollouts \(\mathcal{P}_\theta\), differentiated with respect to the model parameters with the actions held fixed. It favors models under which those rollouts reach the goal, with no additional environment interaction.</li>
+                    <li><b>Optimism weight</b>Set by gradient balancing with a ramp that limits optimism early and increases it over replanning steps. \(\rho=1\) in every experiment.
+                        <div class="mini">\(\displaystyle \alpha_k=\rho\sqrt{k/K_{\max}}\;\frac{\|\nabla\mathcal{L}_{\mathrm{pred}}\|}{\|\nabla\mathcal{L}_{\mathrm{plan}}\|+\varepsilon}\)</div></li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section" id="analysis">
+            <h2>How optimism changes adaptation</h2>
+            <figure class="diag">
+                <div class="plate">
+                    <div class="crop crop-legend" aria-hidden="true"><img src="assets/diagnostics.svg" alt=""></div>
+                    <div class="diag-grid">
+                        <div class="crop crop-success" role="img" aria-label="Planning success versus replanning step on LeWM Reacher and TS PushT for the frozen model, AdaJEPA and OpTTA."><img src="assets/diagnostics.svg" alt=""></div>
+                        <div class="crop crop-optimism" role="img" aria-label="Optimism, the ratio of predicted to actual goal distance, versus replanning step on LeWM Reacher and TS PushT for the frozen model, AdaJEPA and OpTTA."><img src="assets/diagnostics.svg" alt=""></div>
+                    </div>
+                </div>
+                <figcaption>Planning success and the model's optimism, the ratio of predicted to actual goal distance, versus replanning step. LeWM Reacher (top, gamma 1.5) and temporal-straightening PushT (bottom, darkening 0.85), predictor adapted; mean &plusmn; s.e. over three seeds. The paper's full diagnostics also report the prediction loss on the agent's own transitions and on the dataset's start-to-goal trajectory.</figcaption>
+            </figure>
+            <p class="takeaway">The advantage does not come from fitting the agent's own experience better: OpTTA's prediction loss on the transitions it executes is not consistently lower. Its model is <b>more accurate on the goal-reaching trajectory</b> on Reacher and <b>more optimistic about its chosen plan</b> on both tasks. Planning with an optimistic model either reaches the goal or produces transitions that the prediction loss then uses to correct the model.</p>
+        </section>
+
+        <section class="section" id="conclusion">
+            <h2>Conclusion</h2>
+            <p class="prose">Across three JEPA world models, both adaptation scopes, visual and environment shifts, and CEM and gradient-based planners, OpTTA improves final success over prediction-only adaptation in most settings. World-model adaptation should account for the downstream planning objective rather than prediction alone, and optimism offers a simple way to do so. Limitations: on TwoRoom neither objective improves over the pretrained model, and OpTTA adds computation per replan.</p>
+        </section>
+
+        <section class="section" id="bibtex">
+            <h2>BibTeX</h2>
+            <pre class="bib" id="bib-text"><button class="copy" type="button" id="copy-bib" aria-label="Copy BibTeX">Copy</button>@article{mete2026optta,
+  title   = {Adapt for Planning, Not Just Prediction: Optimistic Test-Time World Model Adaptation},
+  author  = {Mete, Akshay and Kalathil, Dileep and Kumar, P. R.},
+  journal = {arXiv preprint arXiv:2610.35636},
+  year    = {2026}
+}</pre>
+        </section>
+
+    </main>
+    <footer class="site-footer">
+        <div class="wrap footer-inner">
+            <span>&copy; <span id="year">2026</span> Akshay Mete</span>
+            <a href="https://akshaymete.com/">akshaymete.com</a>
+        </div>
+    </footer>
+
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/katex.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}], throwOnError: false});"></script>
+    <script>
+        (function () {
+            var root = document.documentElement;
+            var systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+            function currentTheme() {
+                return root.getAttribute('data-theme') || (systemDark.matches ? 'dark' : 'light');
+            }
+            document.getElementById('theme-toggle').addEventListener('click', function () {
+                var next = currentTheme() === 'dark' ? 'light' : 'dark';
+                root.setAttribute('data-theme', next);
+                try { localStorage.setItem('theme', next); } catch (e) {}
+            });
+
+            var tabs = document.querySelectorAll('.tabs [role="tab"]');
+            tabs.forEach(function (tab) {
+                tab.addEventListener('click', function () {
+                    tabs.forEach(function (t) {
+                        var on = t === tab;
+                        t.setAttribute('aria-selected', on ? 'true' : 'false');
+                        document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+                    });
+                });
+            });
+
+            var copyBtn = document.getElementById('copy-bib');
+            if (copyBtn) copyBtn.addEventListener('click', function () {
+                var pre = document.getElementById('bib-text');
+                var text = pre.textContent.replace(/^Copy/, '').trim();
+                var done = function () { copyBtn.textContent = 'Copied'; setTimeout(function () { copyBtn.textContent = 'Copy'; }, 1600); };
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(done, done);
+                } else {
+                    var ta = document.createElement('textarea');
+                    ta.value = text; document.body.appendChild(ta); ta.select();
+                    try { document.execCommand('copy'); } catch (e) {}
+                    document.body.removeChild(ta); done();
+                }
+            });
+
+            document.getElementById('year').textContent = new Date().getFullYear();
+        })();
+    </script>
+</body>
+</html>
